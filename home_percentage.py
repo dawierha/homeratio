@@ -2,6 +2,7 @@ from datetime import date
 from schema import Schema
 from schema import Regex
 import matplotlib.pyplot as plt
+import sys
 import argparse
 
 '''
@@ -9,7 +10,7 @@ These variables in combination with the specified data file is everything
 that needs to be modified in order to read a file with different format.
 Only constraint is that they need to have one field for the start time 
 and one for the end tim.'''
-DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1])$"))
+DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1])$")) #Format YYYY-MM-DD
 DATE_DELIMITER = '-'
 PRESENT_SCHEMA = "present"
 NO_LABELS = 6
@@ -52,7 +53,7 @@ def parse_data(file_name, DataClass, debug=False):
         labels = line.split(',')
         labels = [h.strip().strip('\n') for h in labels]
 
-        if debug: print(labels)
+        if debug: print(f"Labels: {labels}")
         if (len(labels) != NO_LABELS):
             print(f"ERROR, number of labels: {len(labels)}. Should be {NO_LABELS}")
             return None, None
@@ -68,7 +69,7 @@ def parse_data(file_name, DataClass, debug=False):
 
             line_data = line.split(',')
             line_data = [ld.strip().strip('\n') for ld in line_data] #Cleaning up input data
-            if debug: print(line_data)
+            if debug: print(f"Line {line_no}, data: {line_data}")
             if (len(line_data) != NO_LABELS):
                 print(f"ERROR on line {line_no} in {file_name}, number of fields: {len(line_data)}. Should be {NO_LABELS}")
                 return None, None
@@ -100,7 +101,7 @@ def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', nosort=False,
     elif y_axis == 'days':
         pass
     else:
-        print(f"Invalid y_axis: {y_axis}")
+        print(f"ERROR, Invalid y_axis: {y_axis}")
         return None
 
     if not nosort:
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("file", help="specifies the data file to read from")
     parser.add_argument("location", help="specifies the location resolution to sort on. I.e city or region, etc")
     parser.add_argument("-a", "--axis",  help="unit to display the y-axis in. Either 'days' or 'percentage'. Default is 'percentage'",
-                              action="store_true", default='percentage')
+                               default='percentage')
     parser.add_argument("-s", "--nosort", help="do not sort the x-axle", action="store_true", default=False)
     parser.add_argument("-r", "--reverse", help="reverse the x-axle. Must not be used with '--nosort'", action="store_true", default=False)
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true", default=False)
@@ -125,11 +126,11 @@ if __name__ == "__main__":
     
     if args.reverse and args.nosort:
         print(f"ERROR, argument '-r' must not be used with '-s'")
-        exit(0)
+        sys.exit(-1)
 
     labels, data_list = parse_data(args.file, HomeDate, debug=bool(args.verbose))
     if labels == None and data_list == None:
         print("Exited with errors")
-        exit(0)
+        sys.exit(-1)
 
     plot_date(data_list, args.location, 'time_delta', y_axis=args.axis, nosort=bool(args.nosort), reverse=bool(args.reverse), debug=bool(args.verbose))
