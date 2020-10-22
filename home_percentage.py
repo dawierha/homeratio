@@ -12,27 +12,25 @@ END_TIME_INDEX = 5
 
 
 class HomeDate:
-    def calc_time_diff(self):
-        self.time_delta = self.end_time - self.start_time
-
-#Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
-def create_data(attributes, data):
-    hd = HomeDate()
-    for i in range(len(attributes)):
-        if i == START_TIME_INDEX:
-            s_time_list = data[i].split(DATE_DELIMITER)
-            setattr(hd, attributes[i], date(int(s_time_list[0]), int(s_time_list[1]), int(s_time_list[2])))
-        elif i == END_TIME_INDEX:
-            if data[i] == PRESENT_SCHEMA:
-                setattr(hd, attributes[i], date.today())
+    
+    #Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
+    def __init__(self, attributes, data):
+        for i in range(len(attributes)):
+            if i == START_TIME_INDEX:
+                s_time_list = data[i].split(DATE_DELIMITER)
+                setattr(self, attributes[i], date(int(s_time_list[0]), int(s_time_list[1]), int(s_time_list[2])))
+            elif i == END_TIME_INDEX:
+                if data[i] == PRESENT_SCHEMA:
+                    setattr(self, attributes[i], date.today())
+                else:
+                    e_time_list = data[5].split(DATE_DELIMITER)
+                    setattr(self, attributes[i], date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])))
             else:
-                e_time_list = data[5].split(DATE_DELIMITER)
-                setattr(hd, attributes[i], date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])))
-        else:
-            setattr(hd, attributes[i], data[i])
-    hd.calc_time_diff()
+                setattr(self, attributes[i], data[i])
+        
+        self.time_delta = getattr(self, attributes[START_TIME_INDEX]) - getattr(self, attributes[END_TIME_INDEX])
+        
 
-    return hd
 
 def validate_date(date):
     if DATE_SCHEMA.is_valid(date) or date == PRESENT_SCHEMA:
@@ -108,7 +106,7 @@ def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', sort=True):
 
     
 
-labels, data_list = parse_data('data.csv', create_data)
+labels, data_list = parse_data('data.csv', HomeDate)
 if labels == None and data_list == None:
     print("Exited with errors")
     exit(0)
