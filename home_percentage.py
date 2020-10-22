@@ -4,6 +4,7 @@ from schema import Regex
 import matplotlib.pyplot as plt
 
 DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1])$"))
+DATE_DELIMITER = '-'
 PRESENT_SCHEMA = "present"
 NO_LABELS = 6
 START_TIME_INDEX = 4
@@ -11,22 +12,27 @@ END_TIME_INDEX = 5
 
 
 class HomeDate:
-    def __init__(self, data):
-        self.country = data[0] 
-        self.region = data[1]
-        self.city = data[2]
-        self.address = data[3]
-        s_time_list = data[4].split('-')
-        self.start_time = date(int(s_time_list[0]), int(s_time_list[1]), int(s_time_list[2]))
-        
-        if data[5] == PRESENT_SCHEMA:
-            self.end_time = date.today()
-        else:
-            e_time_list = data[5].split('-')
-            self.end_time = date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])) 
-
+    def calc_time_diff(self):
         self.time_delta = self.end_time - self.start_time
 
+#Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
+def create_data(attributes, data):
+    hd = HomeDate()
+    for i in range(len(attributes)):
+        if i == START_TIME_INDEX:
+            s_time_list = data[i].split(DATE_DELIMITER)
+            setattr(hd, attributes[i], date(int(s_time_list[0]), int(s_time_list[1]), int(s_time_list[2])))
+        elif i == END_TIME_INDEX:
+            if data[i] == PRESENT_SCHEMA:
+                setattr(hd, attributes[i], date.today())
+            else:
+                e_time_list = data[5].split(DATE_DELIMITER)
+                setattr(hd, attributes[i], date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])))
+        else:
+            setattr(hd, attributes[i], data[i])
+    hd.calc_time_diff()
+
+    return hd
 
 def validate_date(date):
     if DATE_SCHEMA.is_valid(date) or date == PRESENT_SCHEMA:
@@ -34,9 +40,6 @@ def validate_date(date):
     else:
         print(f"ERROR, Invalid date format '{date}'")
         return False
-
-def create_data(data_list):
-    pass
 
 def parse_data(file_name, DataClass):
     data_list = []
@@ -67,7 +70,7 @@ def parse_data(file_name, DataClass):
                 return None, None
             
             if not validate_date(line_data[START_TIME_INDEX]) or not validate_date(line_data[END_TIME_INDEX]): return None
-            data_list.append(DataClass(line_data))
+            data_list.append(DataClass(labels, line_data))
 
     return labels, data_list
 
@@ -105,7 +108,7 @@ def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', sort=True):
 
     
 
-labels, data_list = parse_data('data.csv', HomeDate)
+labels, data_list = parse_data('data.csv', create_data)
 if labels == None and data_list == None:
     print("Exited with errors")
     exit(0)
