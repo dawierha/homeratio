@@ -35,6 +35,9 @@ def validate_date(date):
         print(f"ERROR, Invalid date format '{date}'")
         return False
 
+def create_data(data_list):
+    pass
+
 def parse_data(file_name, DataClass):
     data_list = []
     with open(file_name, 'r') as file:
@@ -68,7 +71,7 @@ def parse_data(file_name, DataClass):
 
     return labels, data_list
 
-def plot_date(data_list, loc_attr, time_attr):
+def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', sort=True):
     locations = {}
     total_days = 0
     for data in data_list:
@@ -81,12 +84,21 @@ def plot_date(data_list, loc_attr, time_attr):
         total_days += days
     
     print(f"total days: {total_days}")
-    print(locations)
 
     #Converts list to percentage
-    for key in locations:
-        locations[key] = locations[key]/total_days*100
+    if y_axis == 'percentage':
+        for key in locations:
+            locations[key] = locations[key]/total_days*100
+    elif y_axis == 'days':
+        pass
+    else:
+        print(f"Invalid y_axis: {y_axis}")
+        return None
 
+    if sort:
+        locations = {key: value for key, value in sorted(locations.items(), key=lambda item: item[1], reverse=True)}
+
+    print(locations)
     plt.bar(range(len(locations)), list(locations.values()), align='center')
     plt.xticks(range(len(locations)), list(locations.keys()))
     plt.show()
@@ -98,4 +110,4 @@ if labels == None and data_list == None:
     print("Exited with errors")
     exit(0)
 
-plot_date(data_list, 'address', 'time_delta')
+plot_date(data_list, 'region', 'time_delta', y_axis='percentage')
