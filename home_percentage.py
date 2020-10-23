@@ -96,6 +96,7 @@ def aggregate_data(data_list, loc_attr,debug=False):
 
     return locations, total_days
 
+
 def plot_date(data_list, loc_attr, y_axis='percentage', nosort=False, reverse=False, debug=False):
     
     locations, total_days = aggregate_data(data_list, loc_attr, debug=debug)
@@ -104,18 +105,22 @@ def plot_date(data_list, loc_attr, y_axis='percentage', nosort=False, reverse=Fa
     if y_axis == 'percentage':
         for key in locations:
             locations[key] = locations[key]/total_days*100
+        title_label = f"Percentage of days lived in each {loc_attr}"
     elif y_axis == 'days':
-        pass
+        title_label = f"Number of days lived in each {loc_attr}"
     else:
         print(f"ERROR, Invalid y_axis: {y_axis}")
         return None
 
     if not nosort:
         locations = {key: value for key, value in sorted(locations.items(), key=lambda item: item[1], reverse=not reverse)}
-
     if debug: print(locations)
+
     plt.bar(range(len(locations)), list(locations.values()), align='center')
     plt.xticks(range(len(locations)), list(locations.keys()))
+    plt.ylabel(f"{y_axis}") 
+    plt.xlabel(f"{loc_attr}")
+    plt.title(title_label)
     plt.show()
 
     
