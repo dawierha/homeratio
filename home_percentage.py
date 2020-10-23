@@ -79,13 +79,13 @@ def parse_data(file_name, DataClass, debug=False):
 
     return labels, data_list
 
-
-def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', nosort=False, reverse=False, debug=False):
+#Aggregates the total number of days with the given loc_attr
+def aggregate_data(data_list, loc_attr,debug=False):
     locations = {}
     total_days = 0
     for data in data_list:
         location = str(getattr(data, loc_attr))
-        days = getattr(data, time_attr).days
+        days = data.time_delta.days
         if location not in locations:
             locations[location] = days
         else:
@@ -93,6 +93,12 @@ def plot_date(data_list, loc_attr, time_attr, y_axis='percentage', nosort=False,
         total_days += days
     
     if debug: print(f"total days: {total_days}")
+
+    return locations, total_days
+
+def plot_date(data_list, loc_attr, y_axis='percentage', nosort=False, reverse=False, debug=False):
+    
+    locations, total_days = aggregate_data(data_list, loc_attr, debug=debug)
 
     #Converts list to percentage
     if y_axis == 'percentage':
@@ -133,4 +139,4 @@ if __name__ == "__main__":
         print("Exited with errors")
         sys.exit(-1)
 
-    plot_date(data_list, args.location, 'time_delta', y_axis=args.axis, nosort=bool(args.nosort), reverse=bool(args.reverse), debug=bool(args.verbose))
+    plot_date(data_list, args.location, y_axis=args.axis, nosort=bool(args.nosort), reverse=bool(args.reverse), debug=bool(args.verbose))
