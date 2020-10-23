@@ -5,19 +5,9 @@ import matplotlib.pyplot as plt
 import sys
 import argparse
 import traceback
+from config import *
 
-'''
-These variables in combination with the specified data file is everything 
-that needs to be modified in order to read a file with different format.
-Only constraint is that they need to have one field for the start time 
-and one for the end tim.'''
-DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1])$")) #Format YYYY-MM-DD
-DATE_DELIMITER = '-'
-PRESENT_SCHEMA = "present"
-START_TIME_INDEX = 0
-END_TIME_INDEX = 1
-
-
+DATE_SCHEMA = Schema(Regex(DATE_REGEX)) #Format YYYY-MM-DD
 class HomeDate:
     
     #Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
@@ -38,11 +28,11 @@ class HomeDate:
         self.time_delta = getattr(self, attributes[END_TIME_INDEX]) - getattr(self, attributes[START_TIME_INDEX])
         
 
-def validate_date(date):
+def validate_date(date, line_no):
     if DATE_SCHEMA.is_valid(date) or date == PRESENT_SCHEMA:
         return True
     else:
-        print(f"ERROR, Invalid date format '{date}'")
+        print(f"ERROR, Invalid date format '{date}' on line {line_no}")
         return False
 
 
@@ -71,7 +61,7 @@ def parse_data(file_name, DataClass, debug=False):
                 print(f"ERROR on line {line_no} in {file_name}, number of fields: {len(line_data)}. Should be {no_labels}")
                 return None, None
             
-            if not validate_date(line_data[START_TIME_INDEX]) or not validate_date(line_data[END_TIME_INDEX]): return None
+            if not validate_date(line_data[START_TIME_INDEX], line_no) or not validate_date(line_data[END_TIME_INDEX], line_no): return None, None
             data_list.append(DataClass(labels, line_data))
 
     return labels, data_list
