@@ -1,4 +1,4 @@
-# Homepy
+# Homeratio
 This python script calculates how many days you have lived in different places and plots them as a bar graph or pie chart. It can plot the data with varying spatial resolution. These can for example be; continent, country, state, region, city, street, address. These can be specified in the first row of the csv file. Check the files under `./examples` for example data files.
 
 The script require data in a csv format with labels as the first column. It also requires the start date in the first column and the end date in the second column and that each line has the same number of columns. The script also require the date format YYYY-MM-DD. The rest of the columns can have whatever labels you want and how many want, i.e the csv file can have any number of columns but a minimum of 3.
@@ -23,7 +23,7 @@ Bar graph of the same data as above.
 Bar graph showing the number of days instead of percentage.
 
 ### Example 2
-These images are genererated with the `examples/example_data2.csv` file and illustrates grouping on different labels. The 
+These images are genererated with the `examples/example_data2.csv` file and illustrates grouping on different labels. 
 
 ![Pie chart showing the percentage per continent](./images/example2_continent.png)
 
