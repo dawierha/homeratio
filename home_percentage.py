@@ -97,7 +97,7 @@ def aggregate_data(data_list, loc_attr,debug=False):
     return locations, total_days
 
 
-def plot_date(data_list, loc_attr, y_axis='percentage', nosort=False, reverse=False, debug=False):
+def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=False, reverse=False, debug=False):
     
     locations, total_days = aggregate_data(data_list, loc_attr, debug=debug)
 
@@ -116,18 +116,26 @@ def plot_date(data_list, loc_attr, y_axis='percentage', nosort=False, reverse=Fa
         locations = {key: value for key, value in sorted(locations.items(), key=lambda item: item[1], reverse=not reverse)}
     if debug: print(locations)
 
-    plt.bar(range(len(locations)), list(locations.values()), align='center')
-    plt.xticks(range(len(locations)), list(locations.keys()))
-    plt.ylabel(f"{y_axis}") 
-    plt.xlabel(f"{loc_attr}")
+    fig = plt.subplots(figsize =(12, 9))
     plt.title(title_label)
+    
+    if pie_plot:
+        plt.pie(locations.values(), labels=locations.keys(), autopct='%1.1f%%', pctdistance=0.85, radius=1.2) 
+    else:
+        plt.bar(range(len(locations)), list(locations.values()), align='center')
+        plt.xticks(range(len(locations)), list(locations.keys()))
+        plt.xlabel(f"{loc_attr}")
+        plt.ylabel(f"{y_axis}") 
+       
     plt.show()
+    
 
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Calculate the number of days you have spent in different households')
     parser.add_argument("file", help="specifies the data file to read from")
     parser.add_argument("location", help="specifies the location resolution to sort on. I.e city or region, etc")
+    parser.add_argument("-p", "--pie", help="plot as a pie chart instead", action="store_true", default=False)
     parser.add_argument("-a", "--axis",  help="unit to display the y-axis in. Either 'days' or 'percentage'. Default is 'percentage'",
                                default='percentage')
     parser.add_argument("-s", "--nosort", help="do not sort the x-axle", action="store_true", default=False)
@@ -144,4 +152,6 @@ if __name__ == "__main__":
         print("Exited with errors")
         sys.exit(-1)
 
-    plot_date(data_list, args.location, y_axis=args.axis, nosort=bool(args.nosort), reverse=bool(args.reverse), debug=bool(args.verbose))
+    plot_dates(data_list, args.location, y_axis=args.axis, 
+                pie_plot=bool(args.pie), nosort=bool(args.nosort), 
+                reverse=bool(args.reverse), debug=bool(args.verbose))
