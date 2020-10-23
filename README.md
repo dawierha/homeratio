@@ -44,6 +44,6 @@ pip install -r requirements.txt
 ```
 Example of how to run the script. For more info use argument -h:
 ```
-python3 home.py examples/example_data1.csv city
+python3 homeratio.py examples/example_data1.csv city
 ```
  
