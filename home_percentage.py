@@ -14,8 +14,8 @@ DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1
 DATE_DELIMITER = '-'
 PRESENT_SCHEMA = "present"
 NO_LABELS = 6
-START_TIME_INDEX = 4
-END_TIME_INDEX = 5
+START_TIME_INDEX = 0
+END_TIME_INDEX = 1
 
 
 class HomeDate:
@@ -30,7 +30,7 @@ class HomeDate:
                 if data[i] == PRESENT_SCHEMA:
                     setattr(self, attributes[i], date.today())
                 else:
-                    e_time_list = data[5].split(DATE_DELIMITER)
+                    e_time_list = data[i].split(DATE_DELIMITER)
                     setattr(self, attributes[i], date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])))
             else:
                 setattr(self, attributes[i], data[i])
@@ -145,6 +145,10 @@ if __name__ == "__main__":
     
     if args.reverse and args.nosort:
         print(f"ERROR, argument '-r' must not be used with '-s'")
+        sys.exit(-1)
+
+    if args.pie and args.axis=='days':
+        print(f"ERROR, argument '-p' must not be used with '-a days'")
         sys.exit(-1)
 
     labels, data_list = parse_data(args.file, HomeDate, debug=bool(args.verbose))
