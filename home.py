@@ -4,6 +4,7 @@ from schema import Regex
 import matplotlib.pyplot as plt
 import sys
 import argparse
+import traceback
 
 '''
 These variables in combination with the specified data file is everything 
@@ -13,7 +14,6 @@ and one for the end tim.'''
 DATE_SCHEMA = Schema(Regex(r"^\d{1,}-([0]\d{1}|[1][0,1,2])-([0,1,2]\d{1}|[3][0,1])$")) #Format YYYY-MM-DD
 DATE_DELIMITER = '-'
 PRESENT_SCHEMA = "present"
-NO_LABELS = 6
 START_TIME_INDEX = 0
 END_TIME_INDEX = 1
 
@@ -52,11 +52,8 @@ def parse_data(file_name, DataClass, debug=False):
         line = file.readline()
         labels = line.split(',')
         labels = [h.strip().strip('\n') for h in labels]
-
+        no_labels = len(labels)
         if debug: print(f"Labels: {labels}")
-        if (len(labels) != NO_LABELS):
-            print(f"ERROR, number of labels: {len(labels)}. Should be {NO_LABELS}")
-            return None, None
 
         line_no = 1     
         while line:
@@ -70,8 +67,8 @@ def parse_data(file_name, DataClass, debug=False):
             line_data = line.split(',')
             line_data = [ld.strip().strip('\n') for ld in line_data] #Cleaning up input data
             if debug: print(f"Line {line_no}, data: {line_data}")
-            if (len(line_data) != NO_LABELS):
-                print(f"ERROR on line {line_no} in {file_name}, number of fields: {len(line_data)}. Should be {NO_LABELS}")
+            if (len(line_data) != no_labels):
+                print(f"ERROR on line {line_no} in {file_name}, number of fields: {len(line_data)}. Should be {no_labels}")
                 return None, None
             
             if not validate_date(line_data[START_TIME_INDEX]) or not validate_date(line_data[END_TIME_INDEX]): return None
@@ -84,7 +81,13 @@ def aggregate_data(data_list, loc_attr,debug=False):
     locations = {}
     total_days = 0
     for data in data_list:
-        location = str(getattr(data, loc_attr))
+        try:
+            location = str(getattr(data, loc_attr))
+        except AttributeError:
+            if debug: traceback.print_exc() 
+            print(f"ERROR, location '{loc_attr}' is not specified as a label.")
+            sys.exit(-1)
+
         days = data.time_delta.days
         if location not in locations:
             locations[location] = days
