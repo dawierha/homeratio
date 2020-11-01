@@ -12,6 +12,7 @@ class HomeDate:
     
     #Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
     def __init__(self, attributes, data):
+        self.loc_list = [] # list with all the available locations
         for i in range(len(attributes)):
             if i == START_TIME_INDEX:
                 s_time_list = data[i].split(DATE_DELIMITER)
@@ -24,9 +25,9 @@ class HomeDate:
                     setattr(self, attributes[i], date(int(e_time_list[0]), int(e_time_list[1]), int(e_time_list[2])))
             else:
                 setattr(self, attributes[i], data[i])
+                self.loc_list.append(attributes[i])
         
         self.time_delta = getattr(self, attributes[END_TIME_INDEX]) - getattr(self, attributes[START_TIME_INDEX])
-        
 
 def validate_date(date, line_no):
     if DATE_SCHEMA.is_valid(date) or date == PRESENT_SCHEMA:
@@ -76,6 +77,7 @@ def aggregate_data(data_list, loc_attr,debug=False):
         except AttributeError:
             if debug: traceback.print_exc() 
             print(f"ERROR, location '{loc_attr}' is not specified as a label.")
+            print(f"Available location labels: {data.loc_list}")
             sys.exit(-1)
 
         days = data.time_delta.days
