@@ -101,6 +101,7 @@ def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=
         for key in locations:
             locations[key] = locations[key]/total_days*100
         title_label = f"Percentage of days lived in each {loc_attr}"
+        y_axis = "%"
     elif y_axis == 'days':
         title_label = f"Number of days lived in each {loc_attr}"
     else:
@@ -111,9 +112,9 @@ def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=
         locations = {key: value for key, value in sorted(locations.items(), key=lambda item: item[1], reverse=not reverse)}
     if debug: print(locations)
 
-    fig = plt.subplots(figsize =(12, 9))
+    fig, ax = plt.subplots(figsize =(12, 9))
     plt.title(title_label)
-    
+
     if pie_plot:
         plt.pie(locations.values(), labels=locations.keys(), autopct='%1.1f%%', pctdistance=0.85, radius=1.2) 
     else:
@@ -121,7 +122,13 @@ def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=
         plt.xticks(range(len(locations)), list(locations.keys()))
         plt.xlabel(f"{loc_attr}")
         plt.ylabel(f"{y_axis}") 
-       
+        
+        #Prints the number of days/percentage on top of the bar
+        x=0
+        for y in locations.values():
+            plt.text(x-0.1,y+(0.01*ax.get_ylim()[1]), f"{y:.4g} {y_axis}") 
+            x+=1
+
     plt.show()
     
 
