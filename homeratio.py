@@ -8,10 +8,19 @@ import traceback
 from config import *
 
 DATE_SCHEMA = Schema(Regex(DATE_REGEX)) #Format YYYY-MM-DD
+
+
 class HomeDate:
-    
-    #Creates an object of Class HomeDate and sets the attributes according to the first row (labels) in the data file
+    """Class for storing time data for a location
+    """
     def __init__(self, attributes, data):
+        """
+        Creates an object and sets the attributes according to the first row (labels) in the data file
+
+        Args:
+            attributes (list of str: These will form the class attributes
+            data (list of int and str): Data for the attributes
+        """
         self.loc_list = [] # list with all the available locations
         for i in range(len(attributes)):
             if i == START_TIME_INDEX:
@@ -93,7 +102,21 @@ def aggregate_data(data_list, loc_attr,debug=False):
 
 
 def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=False, reverse=False, debug=False):
-    
+    """Plot the number of days as a bar or a pie chart at the given location
+
+    Args:
+        data_list (list of HomeData): List with the number of days spent in one location
+        loc_attr (str): Specifies which location to sort on
+        y_axis (str, optional): Y-axis unit, can be either 'percentage' or 'days'. Defaults to 'percentage'.
+        pie_plot (bool, optional): Flag for creating a pie chart instead of a bar plot. Defaults to False.
+        nosort (bool, optional): Flag for not sorting the bar graph's columns. Defaults to False.
+        reverse (bool, optional): Flag for reversing the sort of the bar graph's columns. Defaults to False.
+        debug (bool, optional): Flag for printing debugging statements. Defaults to False.
+
+    Returns:
+        Does not return anything
+    """
+
     locations, total_days = aggregate_data(data_list, loc_attr, debug=debug)
 
     #Converts list to percentage
