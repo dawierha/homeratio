@@ -129,14 +129,13 @@ def plot_dates(data_list, loc_attr, y_axis='percentage', pie_plot=False, nosort=
             plt.text(x-0.1,y+(0.01*ax.get_ylim()[1]), f"{y:.4g} {y_axis}") 
             x+=1
 
-    plt.show()
     
 
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Calculate the number of days you have spent in different households')
     parser.add_argument("file", help="specifies the data file to read from")
-    parser.add_argument("location", help="specifies the location resolution to sort on. I.e city or region, etc")
+    parser.add_argument("location", nargs='+', help="specifies the location resolution to sort on. I.e city or region, etc")
     parser.add_argument("-p", "--pie", help="plot as a pie chart instead", action="store_true", default=False)
     parser.add_argument("-a", "--axis",  help="unit to display the y-axis in. Either 'days' or 'percentage'. Default is 'percentage'",
                                default='percentage')
@@ -157,7 +156,9 @@ if __name__ == "__main__":
     if labels == None and data_list == None:
         print("Exited with errors")
         sys.exit(-1)
-
-    plot_dates(data_list, args.location, y_axis=args.axis, 
-                pie_plot=bool(args.pie), nosort=bool(args.nosort), 
-                reverse=bool(args.reverse), debug=bool(args.verbose))
+    for location in args.location:
+        plot_dates(data_list, location, y_axis=args.axis, 
+                    pie_plot=bool(args.pie), nosort=bool(args.nosort), 
+                    reverse=bool(args.reverse), debug=bool(args.verbose))
+    plt.show()
+    
